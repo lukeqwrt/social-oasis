@@ -281,7 +281,8 @@ function changeBg() {
 //menu show
 const bars = document.getElementById('bars')
 const menus = document.getElementById('menus')
-bars.addEventListener('click', () => {
+const main = document.getElementById('main')
+bars.addEventListener('click', (e) => {
     bars.classList.toggle('bar-active')
     menus.classList.toggle('menu-active')
     if(bars.classList.contains('bar-active')){
@@ -292,3 +293,4 @@ bars.addEventListener('click', () => {
         bars.classList.remove('fa-times')
     }
 })
+
