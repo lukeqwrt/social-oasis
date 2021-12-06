@@ -162,24 +162,33 @@ fontsBtn.forEach(i => {
 
 
 // colors
-const dataColor = document.querySelectorAll('[data-color]')
+
 const colors = document.querySelectorAll('.color');
 colors.forEach(i => {
     i.addEventListener('click', changeColor)
 })
+
+const dataColor = document.querySelectorAll('[data-color]')
 dataColor.forEach(data => {
     data.addEventListener('click', () => {
         dataColor.forEach(i => {
             i.classList.remove('colorActive')
         })
         data.classList.add('colorActive')
+
     })
 })
 
 function changeColor(e){
     let color = this.getAttribute('data-color');
+    window.sessionStorage.setItem('theme', JSON.stringify({
+        themeColor: color,
+        checked: 'colorActive'
+    }));
     document.documentElement.style.setProperty('--default', color)
-  
+
+    
+    this.classList.add('colorActive')   
     let span = document.querySelectorAll('.colorSpan')
     span.forEach(s => {
         let buttonDot = document.querySelectorAll('.click-dot')
@@ -224,6 +233,53 @@ function changeColor(e){
  
 }
 
+function renderTheme(doc){
+    
+    document.documentElement.style.setProperty('--default', doc.themeColor)
+    let span = document.querySelectorAll('.colorSpan')
+    span.forEach(s => {
+        let buttonDot = document.querySelectorAll('.click-dot')
+        if(doc.themeColor === '#1D9BF0'){
+                s.style.background = "rgba(142, 205, 248, 0.5)"
+                buttonDot.forEach(button => {
+                    button.style.background = "rgba(142, 205, 248, 0.5)"
+                })
+             
+        }else if(doc.themeColor === '#FFD400'){
+                s.style.background = "rgba(255, 212, 0, 0.5)"
+                buttonDot.forEach(button => {
+                    button.style.background = "rgba(255, 212, 0, 0.5)"
+                })
+        
+        }else if(doc.themeColor === '#F91880'){
+                s.style.background = "rgba(249, 24, 128, 0.5)"
+                buttonDot.forEach(button => {
+                    button.style.background = "rgba(249, 24, 128, 0.5)"
+                })
+             
+        }else if(doc.themeColor === '#7856FF'){
+            s.style.background = "rgba(120, 86, 255, 0.5)"
+            buttonDot.forEach(button => {
+                button.style.background = "rgba(120, 86, 255, 0.5)"
+            })
+        }
+        else if(doc.themeColor === '#FF7A00'){
+            s.style.background = "rgba(255, 122, 0, 0.5)"
+            buttonDot.forEach(button => {
+                button.style.background = "rgba(255, 122, 0, 0.5)"
+            })
+        }
+        else if(doc.themeColor === '#00BA7C'){
+            s.style.background = "rgba(0, 186, 124, 0.5)"
+            buttonDot.forEach(button => {
+                button.style.background = "rgba(0, 186, 124, 0.5)"
+            })
+         
+        }
+    })
+
+  
+}
 // background
 const backgrounds = document.querySelectorAll('[data-background]')
 backgrounds.forEach(bg => {
@@ -294,3 +350,180 @@ bars.addEventListener('click', (e) => {
     }
 })
 
+
+
+
+// const imgInput = document.querySelector('#img')
+// const replace = document.querySelector('#replaceHere')
+// imgInput.onchange = evt => {
+//     const [file] = imgInput.files
+//     if (file){
+//         replace.src = URL.createObjectURL(file)
+       
+//     }
+// } 
+
+
+// profile pic
+
+const pictures = document.querySelectorAll('[data-image]')
+const displayHere = document.querySelectorAll('[data-image-profile]')
+pictures.forEach(i => {
+    i.addEventListener('click', (e) => {
+        pictures.forEach(pic => {
+            pic.classList.remove('profile-active')
+        })
+        i.classList.add('profile-active')
+     
+    })
+})
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+const save = document.querySelector('#save')
+auth.onAuthStateChanged(user => {
+    if(user){
+
+        let themecached = window.sessionStorage.getItem('theme')
+        if(!themecached){
+            return
+        }
+        renderTheme(JSON.parse(themecached))
+      
+        const formPost = document.querySelector('#formPost')
+        
+        formPost.addEventListener('submit', (e) => {
+            e.preventDefault();
+            db.collection('users').doc(user.uid).get().then(doc => {
+                var imgCached = JSON.parse(window.sessionStorage.getItem('imgSrc'));
+                db.collection('userPost').add({
+                    post: formPost.post.value,
+                    userUID: user.uid,
+                    name:doc.data().name,
+                    imgSrc: imgCached.imgSrcCached
+                });
+                formPost.post.value = ""
+            })
+        
+        })
+        
+        db.collection('userPost').onSnapshot(snapshot => {
+            let changes = snapshot.docChanges();
+            changes.forEach(change => {
+                if(change.type == 'added'){
+                    renderPost(change.doc);
+                }else if(change.type == 'removed'){
+                    // let li = roomsList.querySelector('[data-id=' + change.doc.id + ']')
+                    // roomsList.removeChild(li);
+                }
+            })
+        })
+
+        function renderPost(doc){
+            let div = document.createElement('div')
+            div.classList.add('user-post')
+            div.setAttribute('data-id', doc.data().userUID);
+            div.classList.add(doc.data().userUID)
+            var userPostContent = `
+            <div class="header-post-wrapper">
+            <div class="image-profile-name">
+                <img data-image-profile="menuProfile" src="${doc.data().imgSrc}" alt="">
+                <p data-font>${doc.data().name}</p>
+                <p data-font>${user.email}</p>
+            </div>
+                
+                <i class="fas fa-ellipsis-h"></i>
+            </div>
+            <p data-font>${doc.data().post}</p>
+            <div class="like">
+                <i class="far fa-heart"></i>                        
+                <i class="far fa-comment-dots"></i>
+                <i class="fas fa-share-square"></i>
+            </div>
+        
+            `
+            div.innerHTML = userPostContent;
+            allPost.prepend(div)
+
+            // // profile pic
+            // const dataImage = div.querySelector('[data-image-profile]')
+            // db.collection('profilePic').where("userId", "==", user.uid).onSnapshot(snapshot => {
+            //     let changes = snapshot.docChanges();
+            //     changes.forEach(change => {
+            //         if(change.doc.id == changes[changes.length - 1].doc.id){
+            //             renderPostPic(change.doc);
+            //         }
+            //     })
+            // })
+            // function renderPostPic(doc){
+            //     dataImage.src = doc.data().imgSrc
+            // }
+        }
+
+        //post
+        const inputPost = document.querySelector('#post')
+        const postBtn = document.querySelector('#postBtn')
+        const allPost = document.querySelector('#allPost')
+        
+        // db.collection('profilePic').where("userId", "==", user.uid).onSnapshot(snapshot => {
+        //     let changes = snapshot.docChanges();
+        //   console.log()
+     
+        // })
+        db.collection('profilePic').where("userId", "==", user.uid).onSnapshot(snapshot => {
+            let changes = snapshot.docChanges();
+            changes.forEach(change => {
+                // if(change.type == 'added'){
+                //     renderProfilePic(change.doc);
+                // }
+
+                if(change.doc.id == changes[changes.length - 1].doc.id){
+                    renderProfilePic(change.doc);
+                }
+            })
+        })
+
+        save.addEventListener('click', (e) => {
+            var activePic = e.target.parentElement.children[1].querySelector('.profile-active img').getAttribute("src")
+        
+            // displayHere.forEach(displayImage => {
+            //     displayImage.src = activePic
+            // })
+        
+            // const editid = document.querySelectorAll('[data-id]')
+            // editid.forEach(i => {
+            //     // console.log(user.uid)
+            //     let dataId = i.getAttribute('data-id')
+            //     if(i.classList.contains(user.uid)){
+            //         db.collection('userPost').where("userUID", "==", user.uid).update({
+            //             imgSrc: activePic
+            //         })
+            //     }
+            // })
+            db.collection('profilePic').add({
+                imgSrc: activePic,
+                userId: user.uid
+            })
+      
+      
+        })
+        
+
+        function renderProfilePic(doc){
+            // console.log(doc.data().imgSrc)
+            displayHere.forEach(i => {
+                i.src = doc.data().imgSrc
+            })
+            window.sessionStorage.setItem('imgSrc', JSON.stringify({
+                imgSrcCached: doc.data().imgSrc,
+            }));
+        }
+    }else{
+        renderTheme()
+        window.location.href = "/index.html"
+
+    }
+
+    
+
+})
