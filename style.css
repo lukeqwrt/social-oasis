@@ -517,6 +517,7 @@ header nav .account .dropdown:nth-child(4) i{
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
 }
 .main .post-container .all-post .user-post .header-post-wrapper .image-profile-name img{
     height: 30px;

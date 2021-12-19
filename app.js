@@ -377,62 +377,56 @@ pictures.forEach(i => {
      
     })
 })
-
 const auth = firebase.auth();
 const db = firebase.firestore();
 const save = document.querySelector('#save')
 auth.onAuthStateChanged(user => {
     if(user){
-
-        let themecached = window.sessionStorage.getItem('theme')
-        if(!themecached){
-            return
-        }
-        renderTheme(JSON.parse(themecached))
-      
+  
         const formPost = document.querySelector('#formPost')
         
         formPost.addEventListener('submit', (e) => {
             e.preventDefault();
             db.collection('users').doc(user.uid).get().then(doc => {
-                var imgCached = JSON.parse(window.sessionStorage.getItem('imgSrc'));
+                // var imgCached = JSON.parse(window.sessionStorage.getItem('imgSrc'));
+                const profilePicture = document.querySelector('#profile')
+               
                 db.collection('userPost').add({
                     post: formPost.post.value,
                     userUID: user.uid,
                     name:doc.data().name,
-                    imgSrc: imgCached.imgSrcCached
+                    email:user.email,
+                    imgSrc: profilePicture.src
                 });
                 formPost.post.value = ""
             })
         
         })
-        
+        const allPost = document.querySelector('#allPost')
         db.collection('userPost').onSnapshot(snapshot => {
             let changes = snapshot.docChanges();
             changes.forEach(change => {
                 if(change.type == 'added'){
                     renderPost(change.doc);
                 }else if(change.type == 'removed'){
-                    // let li = roomsList.querySelector('[data-id=' + change.doc.id + ']')
-                    // roomsList.removeChild(li);
+                    let li = allPost.querySelector('[data-id=' + change.doc.id + ']')
+                    allPost.removeChild(li);
+                    console.log()
                 }
             })
         })
-
         function renderPost(doc){
             let div = document.createElement('div')
             div.classList.add('user-post')
-            div.setAttribute('data-id', doc.data().userUID);
-            div.classList.add(doc.data().userUID)
+            div.setAttribute('data-id', doc.id);
             var userPostContent = `
             <div class="header-post-wrapper">
             <div class="image-profile-name">
                 <img data-image-profile="menuProfile" src="${doc.data().imgSrc}" alt="">
                 <p data-font>${doc.data().name}</p>
-                <p data-font>${user.email}</p>
+                <p data-font>${doc.data().email}</p>
             </div>
-                
-                <i class="fas fa-ellipsis-h"></i>
+                <i id="delete" class="fas fa-trash"></i>
             </div>
             <p data-font>${doc.data().post}</p>
             <div class="like">
@@ -440,10 +434,23 @@ auth.onAuthStateChanged(user => {
                 <i class="far fa-comment-dots"></i>
                 <i class="fas fa-share-square"></i>
             </div>
-        
+            
             `
             div.innerHTML = userPostContent;
-            allPost.prepend(div)
+            allPost.prepend(div);
+            const deletePost = div.querySelector('#delete')
+        
+            deletePost.addEventListener('click', (e) => {
+                var targetEmail = e.target.parentElement.querySelector('.image-profile-name').children[2].innerHTML
+                if(user.email == targetEmail){
+                        e.stopPropagation();
+                        let id = e.target.parentElement.parentElement.getAttribute('data-id');
+                        db.collection('userPost').doc(id).delete();
+                    console.log(id)
+                }else{
+                    console.log('error')
+                }
+            })
 
             // // profile pic
             // const dataImage = div.querySelector('[data-image-profile]')
@@ -463,7 +470,7 @@ auth.onAuthStateChanged(user => {
         //post
         const inputPost = document.querySelector('#post')
         const postBtn = document.querySelector('#postBtn')
-        const allPost = document.querySelector('#allPost')
+     
         
         // db.collection('profilePic').where("userId", "==", user.uid).onSnapshot(snapshot => {
         //     let changes = snapshot.docChanges();
@@ -483,33 +490,20 @@ auth.onAuthStateChanged(user => {
             })
         })
 
+
         save.addEventListener('click', (e) => {
             var activePic = e.target.parentElement.children[1].querySelector('.profile-active img').getAttribute("src")
-        
-            // displayHere.forEach(displayImage => {
-            //     displayImage.src = activePic
-            // })
-        
-            // const editid = document.querySelectorAll('[data-id]')
-            // editid.forEach(i => {
-            //     // console.log(user.uid)
-            //     let dataId = i.getAttribute('data-id')
-            //     if(i.classList.contains(user.uid)){
-            //         db.collection('userPost').where("userUID", "==", user.uid).update({
-            //             imgSrc: activePic
-            //         })
-            //     }
-            // })
             db.collection('profilePic').add({
                 imgSrc: activePic,
                 userId: user.uid
             })
-      
-      
+            // var editName = document.querySelector('#editname')
+            // db.collection('users').doc(user.uid).update({
+            //     name: editName.value
+            // })
         })
-        
-
         function renderProfilePic(doc){
+            // console.log(doc.data().imgSrc)
             // console.log(doc.data().imgSrc)
             displayHere.forEach(i => {
                 i.src = doc.data().imgSrc
@@ -518,6 +512,14 @@ auth.onAuthStateChanged(user => {
                 imgSrcCached: doc.data().imgSrc,
             }));
         }
+
+
+        var themecached = window.sessionStorage.getItem('theme')
+        if(!themecached){
+            return 
+        }
+        renderTheme(JSON.parse(themecached))
+      
     }else{
         renderTheme()
         window.location.href = "/index.html"

@@ -65,7 +65,7 @@
     <div id="main" class="main">
         <div id="menus" class="menus">
             <div data-modal="openTwo" class="profile-display">
-                <img data-image-profile="menuProfile" src="/img/tatatatata.jpg" alt="">
+                <img data-image-profile="menuProfile" id="profile" src="/img/tatatatata.jpg" alt="">
                 <div class="name-wrapper">
                     
                 </div>
@@ -102,7 +102,7 @@
                 </div> -->
                 <div class="my-post">    
                     <!-- <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@valorant.videos/video/7021357051737574658" data-video-id="7021357051737574658" style="max-width: 605px;min-width: 325px;" > <section> <a target="_blank" title="@valorant.videos" href="https://www.tiktok.com/@valorant.videos">@valorant.videos</a> <p>Valorant is just a flashing simulator 🤧 <a title="valorant" target="_blank" href="https://www.tiktok.com/tag/valorant">##valorant</a> <a title="valorantgaming" target="_blank" href="https://www.tiktok.com/tag/valorantgaming">##valorantgaming</a> <a title="valorantclips" target="_blank" href="https://www.tiktok.com/tag/valorantclips">##valorantclips</a> <a title="valorantph" target="_blank" href="https://www.tiktok.com/tag/valorantph">##valorantph</a></p> <a target="_blank" title="♬ original sound - Valorant Videos" href="https://www.tiktok.com/music/original-sound-7021356933387291394">♬ original sound - Valorant Videos</a> </section> </blockquote> <script async src="https://www.tiktok.com/embed.js"></script> -->
-                    <a class="twitter-timeline" data-width="539" href="https://twitter.com/luke_adriannn?ref_src=twsrc%5Etfw">Tweets by luke_adriannn</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                    <!-- <a class="twitter-timeline" data-width="539" href="https://twitter.com/luke_adriannn?ref_src=twsrc%5Etfw">Tweets by luke_adriannn</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> -->
                 </div>
                
             </div>
@@ -268,13 +268,14 @@
         
                 <button class="upload-dp">Upload</button>
             </div> -->
-            <form action="post">
-                <input type="text" placeholder="Name">
+            <form>
+                <input id="editname" name="editname" type="text" placeholder="Name" required>
             </form>
             <button id="save" class="save">Save</button>
         </div>
     </div>
 
+    
     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.4.1/firebase-app.js";
