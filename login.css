@@ -372,6 +372,10 @@ header nav .account .dropdown:nth-child(4) i{
 
 @media screen and (max-width: 949px){
     .choose{
+        position: absolute;
+        top: 30px;
+        left: 50%;
+        transform:translate(-50%,0);
         /* background: #F7F8FA; */
         height: 100vh;
         display: grid;
@@ -381,6 +385,7 @@ header nav .account .dropdown:nth-child(4) i{
         justify-items: center;
         column-gap: 20px;
         max-width: 1200px;
+        width: 100%;
         margin: 0 auto;
     }
     .choose svg{
