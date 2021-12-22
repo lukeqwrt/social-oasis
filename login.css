@@ -373,20 +373,16 @@ header nav .account .dropdown:nth-child(4) i{
 @media screen and (max-width: 949px){
     .choose{
         position: absolute;
-        top: 0px;
-        left: 50%;
-        transform:translate(-50%,0);
         /* background: #F7F8FA; */
         /* height: 100vh; */
-        display: grid;
-        grid-auto-flow: column;
-        grid-template-columns: 1fr;
-        align-items: center;
-        justify-items: center;
+        display: unset;
         column-gap: 20px;
         max-width: 1200px;
         width: 100%;
         margin: 0 auto;
+    }
+    .choose .login{
+        margin: 100px auto;
     }
     .choose svg{
         display: none;
